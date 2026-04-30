@@ -103,16 +103,4 @@ Outputs `YogaMaster_Hybrid_Production.tflite` (~3.2 MB, dynamic-range quantized)
 | Batch dim | `np.expand_dims(arr, axis=0)` → `(1, 224, 224, 3)` |
 | Pose norm | `x / image_width`, `y / image_height` |
 
----
 
-## Assignment Checklist
-
-- [x] Custom CNN model quantized to TFLite (A1)
-- [x] MobileNetV2 model quantized to TFLite (V2)
-- [x] Hybrid CNN+Pose model converted & quantized to TFLite
-- [x] Streamlit app with model selector dropdown
-- [x] Dual-input inference logic for Hybrid model
-- [x] YOLO11 pose extraction (17 keypoints → 34D vector)
-- [x] Skeletal overlay visualization for Hybrid mode
-- [x] Top-5 prediction display with confidence bars
-- [x] Code clean and structured for submission
