@@ -1,106 +1,114 @@
-# YogaMaster AI — CV Assignment 2
+# YogaFusion-CV
 
-Multi-modal yoga pose recognition system supporting three model architectures:  
-**A1 (Custom CNN)** · **V2 (MobileNetV2)** · **Hybrid (CNN + Pose)**
+Multi-modal yoga pose recognition and semantic search system. Supports three model architectures: **A1 (Custom CNN)** · **V2 (MobileNetV2)** · **Hybrid (CNN + Pose)**, with vector similarity-based semantic search functionality.
 
 ---
 
 ## Project Structure
 
 ```
-CV-Assignment2/
-├── app.py                             # Streamlit inference engine (main application)
-├── convert_model.py                   # Phase 1: Keras → TFLite quantization utility
-├── requirements.txt                   # Python dependencies
-├── yoga_class_map.json                # Class index → pose name mapping (107 classes)
+YogaFusion-CV/
+├── README.md                          # This file
 │
-├── YogaMaster_A1_Production.tflite    # Quantized Custom CNN model (~9.8 MB)
-├── YogaMaster_V2_Production.tflite    # Quantized MobileNetV2 model (~5.6 MB)
-├── YogaMaster_Hybrid_Production.tflite # Quantized Hybrid CNN+Pose model (~3.2 MB)
+├── semantic_search/                   # 🧘 Semantic Search System
+│   ├── app.py                         #    Streamlit Web UI
+│   ├── embedding_engine.py            #    TFLite feature extraction engine
+│   ├── db_initializer.py              #    Qdrant database initializer
+│   ├── pose_extractor.py              #    YOLO11 keypoint extraction
+│   ├── config.yaml                    #    Configuration
+│   ├── docker-compose.yml             #    Qdrant Docker setup
+│   └── requirements.txt               #    Python dependencies
 │
-├── yolo11n-pose.pt                    # YOLO11n pose weights (keypoint extraction)
-└── yoga_samples/                      # Sample test images for validation
+├── pose_identification/               # 🎯 Pose Identification System
+│   ├── app.py                         #    Streamlit Web UI
+│   ├── yoga_class_map.json            #    Pose class mapping
+│   └── requirements.txt               #    Python dependencies
+│
+├── image-search/                      # 🖼️ Image Search System (reference)
+│   ├── search_app.py                  #    Streamlit search app
+│   ├── loader.py                      #    Image loader
+│   └── config.yaml                    #    Configuration
+│
+├── models/                            # 🤖 Pre-trained models
+│   ├── YogaMaster_A1_Production.tflite    #    A1: Custom CNN (~9.8 MB)
+│   ├── YogaMaster_V2_Production.tflite    #    V2: MobileNetV2 (~5.6 MB)
+│   ├── YogaMaster_Hybrid_Production.tflite #    Hybrid: CNN+Pose (~3.2 MB)
+│   ├── yolo11n-pose.pt                  #    YOLO11n pose estimation (~35 MB)
+│   └── hybrid_model_final_best.keras    #    Hybrid original Keras model
+│
+├── yoga_samples/                      # 📸 Sample test images
+├── yoga_dataset/                      # 📚 Yoga Dataset (training data)
+└── semantic_search_venv/              # 🐍 Semantic search virtual environment
 ```
 
 ---
 
-## Setup
+## Quick Start
 
-### 1. Create & activate virtual environment
+### 1. Semantic Search System
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate       # macOS / Linux
-# .venv\Scripts\activate        # Windows
+# Start Qdrant database
+cd semantic_search
+docker-compose up -d
+
+# Install dependencies
+cd ../semantic_search_venv
+pip install streamlit qdrant-client pillow numpy pyyaml tensorflow
+
+# Initialize database
+cd ../semantic_search
+python3 db_initializer.py --model v2
+
+# Start Streamlit
+python3 -m streamlit run app.py --server.headless=true
 ```
 
-### 2. Install dependencies
+Open http://localhost:8501 in your browser.
+
+### 2. Pose Identification System
 
 ```bash
+cd pose_identification
 pip install -r requirements.txt
+python3 -m streamlit run app.py
 ```
-
-> **Note:** `tensorflow` 2.16+ bundles CPU and GPU support in a single package.  
-> `tensorflow-cpu` is no longer a separate distribution for Python 3.10+.
-
----
-
-## Running the Application
-
-```bash
-source .venv/bin/activate
-streamlit run app.py
-```
-
-Open **http://localhost:8501** in your browser.
 
 ---
 
 ## Model Overview
 
-| Model | Architecture | Input | Size | Notes |
-|-------|-------------|-------|------|-------|
-| **A1** | Custom CNN | Image (224×224×3) | ~9.8 MB | Baseline model |
-| **V2** | MobileNetV2 | Image (224×224×3) | ~5.6 MB | Transfer learning |
-| **Hybrid** | CNN + Pose | Image + 34D pose vector | ~3.2 MB | Multi-modal; requires YOLO |
+| Model | Architecture | Input | Output Dim | Notes |
+|-------|-------------|-------|------------|-------|
+| **A1** | Custom CNN | Image (224×224×3) | 107 | Baseline model |
+| **V2** | MobileNetV2 | Image (224×224×3) | 107 | Lightweight transfer learning |
+| **Hybrid** | CNN + Pose | Image + 34D pose | 107 | Multi-modal, requires YOLO |
 
-All three TFLite models output a **pre-softmaxed** probability distribution over 107 yoga pose classes. Do **not** apply softmax again at inference time.
-
----
-
-## Hybrid Model — Dual-Input Inference
-
-The Hybrid model takes two inputs simultaneously:
-
-| TFLite Index | Tensor Name | Shape | Description |
-|---|---|---|---|
-| 0 | `serving_default_pose_input:0` | `[1, 34]` | 17 keypoints × (x, y), normalised to [0,1] |
-| 1 | `serving_default_image_input:0` | `[1, 224, 224, 3]` | RGB image, pixel values in [0,1] |
-
-Pose vectors are extracted via **YOLO11n-pose** → 17 COCO keypoints → normalised to image dimensions (`x/W`, `y/H`) → flattened to 34 floats.
+All TFLite models output 107-dimensional feature vectors for vector similarity search.
 
 ---
 
-## Quantization Script (Phase 1)
+## Tech Stack
 
-To re-convert the source Keras model (requires `hybrid_model_final_best.keras`):
-
-```bash
-source .venv/bin/activate
-python convert_model.py
-```
-
-Outputs `YogaMaster_Hybrid_Production.tflite` (~3.2 MB, dynamic-range quantized).
+| Component | Technology |
+|-----------|------------|
+| Feature Extraction | TensorFlow Lite (Custom CNN, MobileNetV2) |
+| Pose Estimation | YOLO11n-pose (Ultralytics) |
+| Vector Database | Qdrant |
+| Web Framework | Streamlit |
+| Containerization | Docker |
 
 ---
 
-## Preprocessing Spec
+## Documentation
 
-| Step | Detail |
-|------|--------|
-| Resize | `(224, 224)` using PIL |
-| Normalise | `pixel / 255.0` → `float32` in `[0, 1]` |
-| Batch dim | `np.expand_dims(arr, axis=0)` → `(1, 224, 224, 3)` |
-| Pose norm | `x / image_width`, `y / image_height` |
+- [semantic_search/README.md](semantic_search/README.md) — Semantic Search System details
+- [pose_identification/README.md](pose_identification/README.md) — Pose Identification System details
+- [image-search/README.md](image-search/README.md) — Image Search System (reference)
 
+---
 
+## Notes
+
+- Agent mission files (`AGENT_MISSION.md`, `REHYDRATE_PROMPT.md`) are excluded from Git
+- Large model files and data directories are added to `.gitignore`

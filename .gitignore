@@ -2,27 +2,34 @@
 .venv/
 venv/
 env/
+semantic_search_venv/
 
-# Agent/internal docs
-pose_identification/AGENT_MISSION.md
-pose_identification/TECHNICAL_SPECIFICATIONS.md
-semantic_search/AGENT_MISSION.md
-semantic_search/KNOWLEDGE_BASE.md
+# Agent/internal docs (should not be committed)
+**/AGENT_MISSION.md
+**/REHYDRATE_PROMPT.md
+**/TECHNICAL_SPECIFICATIONS.md
 
-# Keras model files (large binary)
+# Large model files
 *.keras
+*.pt
+*.tflite
 
-# macOS metadata
-.DS_Store
+# Large data directories
+yoga_dataset/
+image-search
+
+# Qdrant local data
+qdrant_data/
 
 # Python cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.egg-info/
 
-# Qdrant local data
-qdrant_data/
+# macOS metadata
+.DS_Store
 
 # Jupyter
 .ipynb_checkpoints/
@@ -30,3 +37,9 @@ qdrant_data/
 # IDE
 .vscode/
 .idea/
+
+# Log files
+*.log
+
+# Streamlit cache
+.streamlit/
