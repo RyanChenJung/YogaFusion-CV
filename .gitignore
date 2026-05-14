@@ -4,8 +4,10 @@ venv/
 env/
 
 # Agent/internal docs
-AGENT_MISSION.md
-TECHNICAL_SPECIFICATIONS.md
+pose_identification/AGENT_MISSION.md
+pose_identification/TECHNICAL_SPECIFICATIONS.md
+semantic_search/AGENT_MISSION.md
+semantic_search/KNOWLEDGE_BASE.md
 
 # Keras model files (large binary)
 *.keras
@@ -18,6 +20,9 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# Qdrant local data
+qdrant_data/
 
 # Jupyter
 .ipynb_checkpoints/

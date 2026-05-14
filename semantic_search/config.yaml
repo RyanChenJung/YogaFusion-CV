@@ -1,0 +1,26 @@
+qdrant:
+  url: "http://localhost:6333"
+  collections:
+    a1: "yoga_a1"
+    v2: "yoga_v2"
+    hybrid: "yoga_hybrid"
+  limit: 10
+
+models:
+  base_dir: "../models"
+  a1: "YogaMaster_A1_Production.tflite"
+  v2: "YogaMaster_V2_Production.tflite"
+  hybrid: "YogaMaster_Hybrid_Production.tflite"
+
+app:
+  title: "Yoga Semantic Search"
+  image_width: 120
+  upload_types:
+    - jpg
+    - jpeg
+    - png
+  images_dir: "../yoga_samples"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s [%(levelname)s] %(name)s - %(message)s"
