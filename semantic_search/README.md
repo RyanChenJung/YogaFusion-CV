@@ -1,99 +1,99 @@
 # Yoga Pose Semantic Search
 
-基於深度學習的瑜伽姿勢語意搜尋系統。上傳一張瑜伽姿勢圖片，系統會使用 CNN 模型提取特徵向量，並在向量資料庫中尋找相似的瑜伽姿勢。
+Deep learning-based yoga pose semantic search system. Upload a yoga pose image, and the system uses a CNN model to extract feature vectors and finds similar poses in the vector database.
 
-## 功能
+## Features
 
-- 📸 **圖片上傳搜尋** — 上傳瑜伽姿勢圖片，即時尋找相似姿勢
-- 🧠 **多模型支援** — 支援三種預訓練模型：
-  - **A1** — 自訂量化 CNN 模型
-  - **V2** — MobileNetV2 輕量級模型
-  - **Hybrid** — 多模態模型（CNN + YOLO 關節點）
-- 💾 **向量資料庫** — 使用 Qdrant 儲存與搜尋特徵向量
-- 🌐 **Web UI** — Streamlit 建置的美觀介面
+- 📸 **Image Upload Search** — Upload a yoga pose image and find similar poses in real time
+- 🧠 **Multi-Model Support** — Supports three pre-trained models:
+  - **A1** — Custom quantized CNN model
+  - **V2** — MobileNetV2 lightweight model
+  - **Hybrid** — Multi-modal model (CNN + YOLO keypoints)
+- 💾 **Vector Database** — Uses Qdrant to store and search feature vectors
+- 🌐 **Web UI** — Beautiful interface built with Streamlit
 
-## 快速開始
+## Quick Start
 
-### 1. 啟動 Qdrant 資料庫
+### 1. Start Qdrant Database
 
 ```bash
 cd semantic_search
 docker-compose up -d
 ```
 
-### 2. 安裝依賴
+### 2. Install Dependencies
 
 ```bash
 cd semantic_search
 python3 -m pip install streamlit qdrant-client pillow numpy pyyaml tensorflow
 ```
 
-### 3. 初始化資料庫
+### 3. Initialize Database
 
 ```bash
-# 使用 V2 模型初始化
+# Initialize with V2 model
 python3 db_initializer.py --model v2
 
-# 使用 A1 模型初始化
+# Initialize with A1 model
 python3 db_initializer.py --model a1
 
-# 使用 Hybrid 模型初始化（需要 YOLO pose 提取）
+# Initialize with Hybrid model (requires YOLO pose extraction)
 python3 db_initializer.py --model hybrid
 ```
 
-### 4. 啟動 Streamlit
+### 4. Start Streamlit
 
 ```bash
 python3 -m streamlit run app.py --server.headless=true --server.fileWatcherType=none
 ```
 
-瀏覽器開啟 http://localhost:8501
+Open http://localhost:8501 in your browser.
 
-## 檔案結構
+## File Structure
 
 ```
 semantic_search/
-├── app.py                   # Streamlit Web 應用程式
-├── embedding_engine.py      # TFLite 特徵提取引擎
-├── db_initializer.py        # Qdrant 資料庫初始化
-├── pose_extractor.py        # YOLO11 關節點提取
-├── config.yaml              # 設定檔
-├── docker-compose.yml       # Qdrant Docker 設定
-├── requirements.txt         # Python 依賴
-└── README.md                # 本檔案
+├── app.py                   # Streamlit web application
+├── embedding_engine.py      # TFLite feature extraction engine
+├── db_initializer.py        # Qdrant database initializer
+├── pose_extractor.py        # YOLO11 keypoint extraction
+├── config.yaml              # Configuration
+├── docker-compose.yml       # Qdrant Docker setup
+├── requirements.txt         # Python dependencies
+└── README.md                # This file
 ```
 
-## 技術棧
+## Tech Stack
 
-| 元件 | 技術 |
-|------|------|
-| 特徵提取 | TensorFlow Lite (Custom CNN, MobileNetV2) |
-| 向量資料庫 | Qdrant |
-| Web 框架 | Streamlit |
+| Component | Technology |
+|-----------|------------|
+| Feature Extraction | TensorFlow Lite (Custom CNN, MobileNetV2) |
+| Vector Database | Qdrant |
+| Web Framework | Streamlit |
 | Pose Estimation | YOLO11n-pose |
-| 容器化 | Docker |
+| Containerization | Docker |
 
-## 模型說明
+## Model Details
 
 ### A1 - Custom CNN
-自訂量化 CNN 模型，輸入 224×224 圖片，輸出 107 維特徵向量。
+Custom quantized CNN model, takes 224×224 images as input and outputs 107-dimensional feature vectors.
 
 ### V2 - MobileNetV2
-輕量級 MobileNetV2 模型，適合快速特徵提取。
+Lightweight MobileNetV2 model suitable for fast feature extraction.
 
 ### Hybrid - Multi-modal
-結合影像特徵與 YOLO 關節點的多模態模型。需要 YOLO pose 提取才能發揮完整效果。
+Multi-modal model combining image features with YOLO keypoints. Requires YOLO pose extraction for full functionality.
 
-## 資料庫集合
+## Database Collections
 
-| 集合名稱 | 模型 | 維度 |
-|----------|------|------|
+| Collection Name | Model | Dimensions |
+|-----------------|-------|------------|
 | yoga_a1 | A1 | 107 |
 | yoga_v2 | V2 | 107 |
 | yoga_hybrid | Hybrid | 107 |
 
-## 注意事項
+## Notes
 
-- Qdrant 必須在啟動 Streamlit 之前運行
-- Hybrid 模型需要安裝 `ultralytics` 套件以啟用 YOLO pose 提取
-- 建議至少準備 100+ 張圖片以獲得良好的搜尋效果
+- Qdrant must be running before starting Streamlit
+- The Hybrid model requires the `ultralytics` package to enable YOLO pose extraction
+- It is recommended to prepare at least 100+ images for good search results
