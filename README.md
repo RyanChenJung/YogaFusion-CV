@@ -24,11 +24,6 @@ YogaFusion-CV/
 │   ├── yoga_class_map.json            #    Pose class mapping
 │   └── requirements.txt               #    Python dependencies
 │
-├── image-search/                      # 🖼️ Image Search System (reference)
-│   ├── search_app.py                  #    Streamlit search app
-│   ├── loader.py                      #    Image loader
-│   └── config.yaml                    #    Configuration
-│
 ├── models/                            # 🤖 Pre-trained models
 │   ├── YogaMaster_A1_Production.tflite    #    A1: Custom CNN (~9.8 MB)
 │   ├── YogaMaster_V2_Production.tflite    #    V2: MobileNetV2 (~5.6 MB)
